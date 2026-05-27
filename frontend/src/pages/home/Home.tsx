@@ -5,7 +5,7 @@ import { competitionApi } from '../../api/competition';
 import { playerApi } from '../../api/player';
 import type { Competition } from '../../api/competition';
 import type { Player } from '../../api/player';
-import { TrophyOutlined, TeamOutlined, CalendarOutlined, CrownOutlined, UserOutlined, FireOutlined } from '@ant-design/icons';
+import { TrophyOutlined, TeamOutlined, CalendarOutlined, UserOutlined, FireOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 
