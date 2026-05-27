@@ -13,7 +13,8 @@ services:
       - "3306:3306"
     volumes:
       - mysql_data:/var/lib/mysql
-      - ./sql/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./sql/init.sql:/docker-entrypoint-initdb.d/01-init.sql
+      - ./sql/init-test.sql:/docker-entrypoint-initdb.d/02-init-test.sql
       - ./mysql/my.cnf:/etc/mysql/conf.d/custom.cnf
     mem_limit: 384m
     command: --default-authentication-plugin=caching_sha2_password
@@ -34,6 +35,7 @@ services:
     mem_limit: 64m
     command: redis-server --maxmemory 48mb --maxmemory-policy allkeys-lru --save 60 1000
 
+  # ===== 正式环境后端 =====
   backend:
     build:
       context: ./backend
@@ -43,11 +45,13 @@ services:
     ports:
       - "8080:8080"
     environment:
+      SPRING_PROFILES_ACTIVE: prod
       SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/malahot?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
       SPRING_DATASOURCE_USERNAME: malahot
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-malahot2026!}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET:-malahotProdSecret2026}
       JAVA_OPTS: "-Xms128m -Xmx384m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m"
       TZ: Asia/Shanghai
     mem_limit: 512m
@@ -57,6 +61,33 @@ services:
       redis:
         condition: service_started
 
+  # ===== 测试环境后端 =====
+  backend-test:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: malahot-backend-test
+    restart: unless-stopped
+    ports:
+      - "8082:8080"
+    environment:
+      SPRING_PROFILES_ACTIVE: test
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/malahot_test?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: malahot
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-malahot2026!}
+      SPRING_DATA_REDIS_HOST: redis
+      SPRING_DATA_REDIS_PORT: 6379
+      JWT_SECRET: ${JWT_SECRET_TEST:-malahotTestSecret2026}
+      JAVA_OPTS: "-Xms64m -Xmx192m -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m"
+      TZ: Asia/Shanghai
+    mem_limit: 256m
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_started
+
+  # ===== 正式环境前端 (端口 80) =====
   nginx:
     build:
       context: ./frontend
@@ -68,6 +99,19 @@ services:
     mem_limit: 32m
     depends_on:
       - backend
+
+  # ===== 测试环境前端 (端口 8081) =====
+  nginx-test:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.test
+    container_name: malahot-nginx-test
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    mem_limit: 32m
+    depends_on:
+      - backend-test
 
 volumes:
   mysql_data:

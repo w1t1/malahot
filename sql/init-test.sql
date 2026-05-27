@@ -1,11 +1,14 @@
--- Malahot 电竞赛事平台 数据库初始化脚本
--- MySQL 8.0 + utf8mb4
+-- Malahot 测试环境数据库初始化
+-- 复用同一个 MySQL 实例，使用不同的数据库名
 
-USE malahot;
+CREATE DATABASE IF NOT EXISTS `malahot_test` CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+GRANT ALL PRIVILEGES ON `malahot_test`.* TO 'malahot'@'%';
+FLUSH PRIVILEGES;
 
--- ============================================
--- 用户表
--- ============================================
+USE malahot_test;
+
+-- 以下表结构与正式环境一致
+
 CREATE TABLE IF NOT EXISTS `user` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `phone` VARCHAR(20) NOT NULL COMMENT '手机号',
@@ -20,9 +23,6 @@ CREATE TABLE IF NOT EXISTS `user` (
     KEY `idx_role` (`role`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
--- ============================================
--- 赛事表
--- ============================================
 CREATE TABLE IF NOT EXISTS `competition` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `title` VARCHAR(100) NOT NULL COMMENT '赛事名称',
@@ -32,11 +32,11 @@ CREATE TABLE IF NOT EXISTS `competition` (
     `cover_image` VARCHAR(255) DEFAULT NULL COMMENT '封面图片URL',
     `max_teams` INT NOT NULL DEFAULT 16 COMMENT '最大参赛队伍数',
     `team_size` INT NOT NULL DEFAULT 5 COMMENT '每队人数',
-    `format` VARCHAR(20) NOT NULL DEFAULT 'SINGLE_ELIMINATION' COMMENT '赛制: SINGLE_ELIMINATION/DOUBLE_ELIMINATION/GROUP_STAGE',
+    `format` VARCHAR(20) NOT NULL DEFAULT 'SINGLE_ELIMINATION' COMMENT '赛制',
     `registration_start` DATETIME NOT NULL COMMENT '报名开始时间',
     `registration_end` DATETIME NOT NULL COMMENT '报名截止时间',
     `competition_start` DATETIME DEFAULT NULL COMMENT '比赛开始时间',
-    `status` VARCHAR(20) NOT NULL DEFAULT 'DRAFT' COMMENT '状态: DRAFT/REGISTRATION/IN_PROGRESS/FINISHED/CANCELLED',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'DRAFT' COMMENT '状态',
     `created_by` BIGINT NOT NULL COMMENT '创建人ID',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -46,9 +46,6 @@ CREATE TABLE IF NOT EXISTS `competition` (
     KEY `idx_game_type` (`game_type`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='赛事表';
 
--- ============================================
--- 战队表
--- ============================================
 CREATE TABLE IF NOT EXISTS `team` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `name` VARCHAR(50) NOT NULL COMMENT '战队名称',
@@ -56,7 +53,7 @@ CREATE TABLE IF NOT EXISTS `team` (
     `captain_id` BIGINT NOT NULL COMMENT '队长用户ID',
     `competition_id` BIGINT NOT NULL COMMENT '所属赛事ID',
     `invite_code` VARCHAR(20) NOT NULL COMMENT '邀请码',
-    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING/APPROVED/REJECTED/ELIMINATED/CHAMPION',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -67,23 +64,17 @@ CREATE TABLE IF NOT EXISTS `team` (
     KEY `idx_status` (`status`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='战队表';
 
--- ============================================
--- 队员表
--- ============================================
 CREATE TABLE IF NOT EXISTS `team_member` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `team_id` BIGINT NOT NULL COMMENT '战队ID',
     `user_id` BIGINT NOT NULL COMMENT '用户ID',
-    `role` VARCHAR(20) NOT NULL DEFAULT 'MEMBER' COMMENT '队内角色: CAPTAIN/MEMBER',
+    `role` VARCHAR(20) NOT NULL DEFAULT 'MEMBER' COMMENT '队内角色',
     `joined_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_team_user` (`team_id`, `user_id`),
     KEY `idx_user_id` (`user_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='队员表';
 
--- ============================================
--- 对阵表
--- ============================================
 CREATE TABLE IF NOT EXISTS `match_record` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `competition_id` BIGINT NOT NULL COMMENT '赛事ID',
@@ -95,7 +86,7 @@ CREATE TABLE IF NOT EXISTS `match_record` (
     `score_b` INT DEFAULT NULL COMMENT '队伍B得分',
     `winner_id` BIGINT DEFAULT NULL COMMENT '获胜队伍ID',
     `scheduled_at` DATETIME DEFAULT NULL COMMENT '计划比赛时间',
-    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态: PENDING/IN_PROGRESS/FINISHED',
+    `status` VARCHAR(20) NOT NULL DEFAULT 'PENDING' COMMENT '状态',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
@@ -104,9 +95,6 @@ CREATE TABLE IF NOT EXISTS `match_record` (
     KEY `idx_team_b` (`team_b_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='对阵记录表';
 
--- ============================================
--- 排名表
--- ============================================
 CREATE TABLE IF NOT EXISTS `ranking` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `competition_id` BIGINT NOT NULL COMMENT '赛事ID',
@@ -121,14 +109,11 @@ CREATE TABLE IF NOT EXISTS `ranking` (
     KEY `idx_competition_rank` (`competition_id`, `rank_position`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='排名表';
 
--- ============================================
--- 短信记录表（风控用）
--- ============================================
 CREATE TABLE IF NOT EXISTS `sms_log` (
     `id` BIGINT NOT NULL AUTO_INCREMENT,
     `phone` VARCHAR(20) NOT NULL COMMENT '手机号',
     `code` VARCHAR(10) NOT NULL COMMENT '验证码',
-    `type` VARCHAR(20) NOT NULL DEFAULT 'LOGIN' COMMENT '类型: LOGIN',
+    `type` VARCHAR(20) NOT NULL DEFAULT 'LOGIN' COMMENT '类型',
     `ip` VARCHAR(45) DEFAULT NULL COMMENT '请求IP',
     `sent_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `used` TINYINT NOT NULL DEFAULT 0 COMMENT '是否已使用',
@@ -136,7 +121,5 @@ CREATE TABLE IF NOT EXISTS `sms_log` (
     KEY `idx_phone_sent` (`phone`, `sent_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信记录表';
 
--- ============================================
--- 插入默认管理员（手机号 13800000000，后续可修改）
--- ============================================
+-- 测试环境管理员
 INSERT INTO `user` (`phone`, `nickname`, `role`) VALUES ('13800000000', UNHEX('E7AEA1E79086E59198'), 'ADMIN');
