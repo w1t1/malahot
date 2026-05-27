@@ -11,8 +11,8 @@ if [ -f /etc/profile.d/jdk17.sh ]; then
     source /etc/profile.d/jdk17.sh
 fi
 
-echo "拉取最新代码..."
-git pull
+# echo "拉取最新代码..."
+# git pull
 
 echo "构建后端..."
 cd backend && mvn package -DskipTests -B -q && cd ..
