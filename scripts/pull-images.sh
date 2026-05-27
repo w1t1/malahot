@@ -13,7 +13,6 @@ IMAGES=(
     "mysql:8.0"
     "redis:7-alpine"
     "nginx:alpine"
-    "eclipse-temurin:17-jre-alpine"
 )
 
 pull_with_retry() {

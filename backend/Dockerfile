@@ -1,5 +1,6 @@
 # Runtime only — JAR is pre-built on host by deploy script
-FROM eclipse-temurin:17-jre-alpine
+FROM alpine:latest
+RUN apk add --no-cache openjdk17-jre
 WORKDIR /app
 COPY target/*.jar app.jar
 

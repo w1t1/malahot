@@ -57,8 +57,14 @@ fi
 # 3. Node.js 20
 echo "[3/3] 安装 Node.js 20..."
 if ! command -v node &> /dev/null; then
-    curl -fsSL https://rpm.nodesource.com/setup_20.x | sudo bash -
-    sudo yum install -y nodejs
+    # 从 npmmirror 下载预编译二进制（兼容所有 Linux 发行版）
+    NODE_VERSION=20.18.0
+    echo "  下载 Node.js v${NODE_VERSION}..."
+    curl -fsSL "https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o /tmp/node.tar.xz
+    sudo tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1
+    rm -f /tmp/node.tar.xz
+    # 配置 npm 使用淘宝镜像
+    npm config set registry https://registry.npmmirror.com
     echo "  ✓ Node.js $(node -v) 安装完成"
 else
     echo "  ✓ Node.js 已安装: $(node -v)"
