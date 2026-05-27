@@ -37,6 +37,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/competitions/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/matches/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/rankings/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/players/**").permitAll()
                 // Swagger / Knife4j
                 .requestMatchers("/swagger-ui/**", "/v3/api-docs/**", "/doc.html", "/webjars/**").permitAll()
                 // All other requests require authentication

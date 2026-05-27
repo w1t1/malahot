@@ -6,6 +6,11 @@
 set -e
 cd /opt/malahot
 
+# 确保使用 JDK 17
+if [ -f /etc/profile.d/jdk17.sh ]; then
+    source /etc/profile.d/jdk17.sh
+fi
+
 echo "拉取最新代码..."
 git pull
 

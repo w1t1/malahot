@@ -12,11 +12,28 @@ echo "=========================================="
 
 # 1. JDK 17
 echo "[1/3] 安装 JDK 17..."
-if ! command -v javac &> /dev/null; then
+if ! rpm -q java-17-openjdk-devel &> /dev/null; then
     sudo yum install -y java-17-openjdk java-17-openjdk-devel
     echo "  ✓ JDK 17 安装完成"
 else
-    echo "  ✓ JDK 已安装: $(java -version 2>&1 | head -1)"
+    echo "  ✓ JDK 17 已安装"
+fi
+
+# 确保 JDK 17 为默认版本（系统可能有多个 JDK）
+JDK17_HOME=$(find /usr/lib/jvm -maxdepth 1 -type d -name "*17*" | head -1)
+if [ -n "$JDK17_HOME" ]; then
+    export JAVA_HOME="$JDK17_HOME"
+    export PATH="$JAVA_HOME/bin:$PATH"
+    # 写入 profile 持久化
+    sudo tee /etc/profile.d/jdk17.sh > /dev/null <<JDKEOF
+export JAVA_HOME=$JAVA_HOME
+export PATH=\$JAVA_HOME/bin:\$PATH
+JDKEOF
+    echo "  ✓ JAVA_HOME=$JAVA_HOME"
+    echo "  ✓ java: $(java -version 2>&1 | head -1)"
+else
+    echo "  ✗ 未找到 JDK 17，请手动安装"
+    exit 1
 fi
 
 # 2. Maven
@@ -58,7 +75,7 @@ fi
 echo "[3/3] 安装 Node.js 20..."
 if ! command -v node &> /dev/null; then
     # 从 npmmirror 下载预编译二进制（兼容所有 Linux 发行版）
-    NODE_VERSION=20.18.0
+    NODE_VERSION=20.19.0
     echo "  下载 Node.js v${NODE_VERSION}..."
     curl -fsSL "https://npmmirror.com/mirrors/node/v${NODE_VERSION}/node-v${NODE_VERSION}-linux-x64.tar.xz" -o /tmp/node.tar.xz
     sudo tar -xJf /tmp/node.tar.xz -C /usr/local --strip-components=1

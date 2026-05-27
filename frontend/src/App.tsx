@@ -11,6 +11,7 @@ import AdminCompetitions from './pages/admin/AdminCompetitions';
 import AdminCompetitionEdit from './pages/admin/AdminCompetitionEdit';
 import AdminTeamReview from './pages/admin/AdminTeamReview';
 import AdminMatchManage from './pages/admin/AdminMatchManage';
+import Players from './pages/player/Players';
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Home />} />
+            <Route path="players" element={<Players />} />
             <Route path="competition/:id" element={<CompetitionDetail />} />
             <Route path="my-teams" element={<MyTeams />} />
             <Route path="team/:id" element={<TeamDetail />} />

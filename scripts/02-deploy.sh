@@ -8,6 +8,11 @@ set -e
 
 cd /opt/malahot
 
+# 确保使用 JDK 17
+if [ -f /etc/profile.d/jdk17.sh ]; then
+    source /etc/profile.d/jdk17.sh
+fi
+
 echo "=========================================="
 echo "  Malahot 部署"
 echo "=========================================="
@@ -44,10 +49,10 @@ echo "  ✓ 后端构建完成: $(ls -lh backend/target/*.jar | awk '{print $5, 
 # 4. 构建前端 dist（宿主机构建，不依赖 Docker 拉 node 镜像）
 echo "[4/5] 构建前端..."
 cd frontend
-if [ ! -d node_modules ]; then
-    npm ci --silent
-fi
-npm run build --silent
+# 清除可能从其他平台复制的 node_modules
+rm -rf node_modules
+npm install --silent
+npm run build
 cd ..
 echo "  ✓ 前端构建完成: $(du -sh frontend/dist | awk '{print $1}')"
 

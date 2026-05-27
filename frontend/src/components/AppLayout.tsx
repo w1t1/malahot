@@ -20,6 +20,7 @@ export default function AppLayout() {
 
   const menuItems = [
     { key: '/', icon: <HomeOutlined />, label: <Link to="/">赛事大厅</Link> },
+    { key: '/players', icon: <TeamOutlined />, label: <Link to="/players">选手名单</Link> },
     ...(isLoggedIn
       ? [{ key: '/my-teams', icon: <TeamOutlined />, label: <Link to="/my-teams">我的战队</Link> }]
       : []),

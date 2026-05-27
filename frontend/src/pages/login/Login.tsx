@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Form, Input, Button, message, Card } from 'antd';
-import { MobileOutlined, LockOutlined, TrophyOutlined } from '@ant-design/icons';
-import { useNavigate } from 'react-router-dom';
+import { MobileOutlined, LockOutlined, TrophyOutlined, ArrowLeftOutlined } from '@ant-design/icons';
+import { useNavigate, Link } from 'react-router-dom';
 import { authApi } from '../../api/auth';
 import { useAuthStore } from '../../stores/auth';
 
@@ -54,6 +54,9 @@ export default function Login() {
   return (
     <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '100vh', background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' }}>
       <Card style={{ width: 400, borderRadius: 8 }}>
+        <Link to="/" style={{ display: 'inline-flex', alignItems: 'center', gap: 4, marginBottom: 16, color: '#666' }}>
+          <ArrowLeftOutlined /> 返回主页
+        </Link>
         <div style={{ textAlign: 'center', marginBottom: 32 }}>
           <TrophyOutlined style={{ fontSize: 48, color: '#1677ff' }} />
           <h2>Malahot 电竞赛事</h2>
