@@ -35,6 +35,9 @@ echo "[3/7] 安装 Docker..."
 if ! command -v docker &> /dev/null; then
     sudo yum install -y yum-utils
     sudo yum-config-manager --add-repo https://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+    # Alibaba Cloud Linux 4 需要将 $releasever 替换为 8（兼容 CentOS 8）
+    sudo sed -i 's/$releasever/8/g' /etc/yum.repos.d/docker-ce.repo
+    sudo yum makecache
     sudo yum install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
     sudo systemctl start docker
     sudo systemctl enable docker
