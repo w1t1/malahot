@@ -1,6 +1,7 @@
 -- chikeai.vip 选手数据导入测试环境
--- 执行: docker exec -i malahot-mysql mysql -u root -p'Malahot2025!' malahot_test < /opt/malahot/sql/import-chikeai-data.sql
+-- 执行: docker exec -i malahot-mysql mysql -u root -p'Malahot2025!' --default-character-set=utf8mb4 malahot_test < /opt/malahot/sql/import-chikeai-data.sql
 
+SET NAMES utf8mb4;
 USE malahot_test;
 
 -- 清空已有测试选手数据（保留管理员 id=1）
