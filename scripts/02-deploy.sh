@@ -14,10 +14,8 @@ echo "=========================================="
 
 # 1. 创建 .env 文件（首次部署）
 if [ ! -f .env ]; then
-    echo "[1/3] 创建 .env 配置文件..."
-    # 生成随机 JWT Secret
+    echo "[1/5] 创建 .env 配置文件..."
     JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n/+=')
-    # 生成随机 MySQL 密码
     MYSQL_PWD=$(openssl rand -base64 16 | tr -d '\n/+=')
 
     cat > .env <<EOF
@@ -29,15 +27,32 @@ EOF
     echo "  MySQL 密码: ${MYSQL_PWD}"
     echo "  请妥善保管以上信息！"
 else
-    echo "[1/3] .env 已存在，跳过"
+    echo "[1/5] .env 已存在，跳过"
 fi
 
 # 2. 确保所有镜像已拉取
-echo "[2/3] 检查 Docker 镜像..."
+echo "[2/5] 检查 Docker 镜像..."
 bash scripts/pull-images.sh
 
-# 3. 构建并启动所有服务（前端在 Docker 内构建，无需 npm）
-echo "[3/3] 构建 Docker 镜像并启动服务..."
+# 3. 构建后端 JAR（宿主机构建，不依赖 Docker 拉 maven 镜像）
+echo "[3/5] 构建后端 JAR..."
+cd backend
+mvn package -DskipTests -B -q
+cd ..
+echo "  ✓ 后端构建完成: $(ls -lh backend/target/*.jar | awk '{print $5, $9}')"
+
+# 4. 构建前端 dist（宿主机构建，不依赖 Docker 拉 node 镜像）
+echo "[4/5] 构建前端..."
+cd frontend
+if [ ! -d node_modules ]; then
+    npm ci --silent
+fi
+npm run build --silent
+cd ..
+echo "  ✓ 前端构建完成: $(du -sh frontend/dist | awk '{print $1}')"
+
+# 5. Docker 打包运行时镜像并启动
+echo "[5/5] 构建 Docker 运行时镜像并启动服务..."
 docker compose up -d --build
 
 # 等待服务就绪
