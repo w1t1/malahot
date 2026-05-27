@@ -51,7 +51,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-malahot2026!}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET:-malahotProdSecret2026}
+      JWT_SECRET: ${JWT_SECRET:-malahotProdSecretKey2026ForJwtAuth!}
       JAVA_OPTS: "-Xms128m -Xmx384m -XX:+UseSerialGC -XX:MaxMetaspaceSize=128m"
       TZ: Asia/Shanghai
     mem_limit: 512m
@@ -77,7 +77,7 @@ services:
       SPRING_DATASOURCE_PASSWORD: ${MYSQL_PASSWORD:-malahot2026!}
       SPRING_DATA_REDIS_HOST: redis
       SPRING_DATA_REDIS_PORT: 6379
-      JWT_SECRET: ${JWT_SECRET_TEST:-malahotTestSecret2026}
+      JWT_SECRET: ${JWT_SECRET_TEST:-malahotTestSecretKey2026ForJwtAuth!}
       JAVA_OPTS: "-Xms64m -Xmx192m -XX:+UseSerialGC -XX:MaxMetaspaceSize=96m"
       TZ: Asia/Shanghai
     mem_limit: 256m
