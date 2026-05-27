@@ -14,7 +14,7 @@ echo "=========================================="
 
 # 1. 创建 .env 文件（首次部署）
 if [ ! -f .env ]; then
-    echo "[1/4] 创建 .env 配置文件..."
+    echo "[1/3] 创建 .env 配置文件..."
     # 生成随机 JWT Secret
     JWT_SECRET=$(openssl rand -base64 48 | tr -d '\n/+=')
     # 生成随机 MySQL 密码
@@ -29,25 +29,19 @@ EOF
     echo "  MySQL 密码: ${MYSQL_PWD}"
     echo "  请妥善保管以上信息！"
 else
-    echo "[1/4] .env 已存在，跳过"
+    echo "[1/3] .env 已存在，跳过"
 fi
 
-# 2. 构建前端
-echo "[2/4] 构建前端..."
-cd frontend
-if [ -d node_modules ]; then
-    npm run build
-else
-    npm ci && npm run build
-fi
-cd ..
+# 2. 确保所有镜像已拉取
+echo "[2/3] 检查 Docker 镜像..."
+bash scripts/pull-images.sh
 
-# 3. 构建并启动所有服务
-echo "[3/4] 构建 Docker 镜像并启动服务..."
+# 3. 构建并启动所有服务（前端在 Docker 内构建，无需 npm）
+echo "[3/3] 构建 Docker 镜像并启动服务..."
 docker compose up -d --build
 
-# 4. 等待服务就绪
-echo "[4/4] 等待服务启动..."
+# 等待服务就绪
+echo "等待服务启动..."
 echo -n "  等待 MySQL"
 for i in $(seq 1 30); do
     if docker compose exec mysql mysqladmin ping -h localhost --silent 2>/dev/null; then

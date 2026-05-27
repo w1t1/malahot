@@ -54,8 +54,9 @@ sudo mkdir -p /etc/docker
 cat <<EOF | sudo tee /etc/docker/daemon.json
 {
     "registry-mirrors": [
-        "https://mirror.ccs.tencentyun.com",
-        "https://docker.mirrors.ustc.edu.cn"
+        "https://docker.1ms.run",
+        "https://docker.xuanyuan.me",
+        "https://docker.anyhub.us.kg"
     ],
     "log-driver": "json-file",
     "log-opts": {
