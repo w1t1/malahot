@@ -17,7 +17,17 @@ import Champions from './pages/champions/Champions';
 
 function App() {
   return (
-    <ConfigProvider locale={zhCN} theme={{ token: { colorPrimary: '#1677ff' } }}>
+    <ConfigProvider locale={zhCN} theme={{
+      token: {
+        colorPrimary: '#e94560',
+        borderRadius: 8,
+        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif",
+      },
+      components: {
+        Table: { borderRadius: 8 },
+        Card: { borderRadiusLG: 12 },
+      },
+    }}>
       <BrowserRouter>
         <Routes>
           <Route path="/login" element={<Login />} />

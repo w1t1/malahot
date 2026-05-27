@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, Link } from 'react-router-dom';
+import { Outlet, useNavigate, Link, useLocation } from 'react-router-dom';
 import { Layout, Menu, Button, Dropdown, Avatar, Space } from 'antd';
 import {
   HomeOutlined,
@@ -18,6 +18,7 @@ const { Header, Content, Footer } = Layout;
 export default function AppLayout() {
   const { isLoggedIn, nickname, role, logout } = useAuthStore();
   const navigate = useNavigate();
+  const location = useLocation();
   const isAdmin = role === 'ADMIN';
 
   const menuItems = [
@@ -45,38 +46,39 @@ export default function AppLayout() {
   };
 
   return (
-    <Layout style={{ minHeight: '100vh' }}>
-      <Header style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 24px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-          <TrophyOutlined style={{ fontSize: 24, color: '#fff' }} />
-          <span style={{ color: '#fff', fontSize: 18, fontWeight: 'bold' }}>Malahot 电竞赛事</span>
+    <Layout style={{ minHeight: '100vh', background: '#f0f2f5' }}>
+      <Header className="app-header" style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '0 32px', height: 64 }}>
+        <div className="app-logo" onClick={() => navigate('/')}>
+          <TrophyOutlined className="app-logo-icon" />
+          <span className="app-logo-text">Malahot</span>
         </div>
         <Menu
           theme="dark"
           mode="horizontal"
+          selectedKeys={[location.pathname]}
           items={menuItems}
-          style={{ flex: 1, marginLeft: 40, minWidth: 0 }}
+          style={{ flex: 1, marginLeft: 40, minWidth: 0, background: 'transparent', borderBottom: 'none' }}
         />
         <div>
           {isLoggedIn ? (
             <Dropdown menu={{ items: userMenuItems, onClick: handleUserMenu }}>
-              <Space style={{ color: '#fff', cursor: 'pointer' }}>
-                <Avatar icon={<UserOutlined />} size="small" />
-                {nickname}
+              <Space style={{ color: '#fff', cursor: 'pointer', padding: '4px 12px', borderRadius: 20, background: 'rgba(255,255,255,0.1)', transition: 'background 0.3s' }}>
+                <Avatar icon={<UserOutlined />} size="small" style={{ backgroundColor: '#e94560' }} />
+                <span style={{ fontSize: 14 }}>{nickname}</span>
               </Space>
             </Dropdown>
           ) : (
-            <Button type="primary" onClick={() => navigate('/login')}>
+            <Button type="primary" onClick={() => navigate('/login')} style={{ borderRadius: 20, padding: '0 24px', fontWeight: 600 }}>
               登录
             </Button>
           )}
         </div>
       </Header>
-      <Content style={{ padding: '24px 48px' }}>
+      <Content className="app-content">
         <Outlet />
       </Content>
-      <Footer style={{ textAlign: 'center' }}>
-        Malahot 电竞赛事平台 ©2026
+      <Footer className="app-footer">
+        Malahot 电竞赛事平台 ©2026 · 让竞技更精彩
       </Footer>
     </Layout>
   );

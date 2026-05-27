@@ -5,7 +5,7 @@ import { competitionApi } from '../../api/competition';
 import { playerApi } from '../../api/player';
 import type { Competition } from '../../api/competition';
 import type { Player } from '../../api/player';
-import { TrophyOutlined, TeamOutlined, CalendarOutlined, UserOutlined, FireOutlined } from '@ant-design/icons';
+import { TrophyOutlined, TeamOutlined, CalendarOutlined, UserOutlined, FireOutlined, CrownOutlined, ThunderboltOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 
@@ -17,37 +17,38 @@ const statusMap: Record<string, { color: string; text: string }> = {
   CANCELLED: { color: 'red', text: '已取消' },
 };
 
-const ratingColors: Record<string, string> = {
-  SSR: '#ff4d4f', SR: '#fa8c16', S: '#faad14',
-  A: '#52c41a', B: '#1677ff', C: '#999',
-  D: '#bbb', E: '#ddd',
-};
+function RatingTag({ rating }: { rating: string }) {
+  return <Tag className={`rating-tag rating-${rating}`}>{rating}级</Tag>;
+}
 
 function TopPlayerCard({ player, rank }: { player: Player; rank: number }) {
   const isFirst = rank === 1;
-  const heights = [180, 150, 150];
-  const badges = ['👑', '', ''];
-  const bgColors = [
-    'linear-gradient(135deg, #f5af19 0%, #f12711 100%)',
-    'linear-gradient(135deg, #c0c0c0 0%, #8e8e8e 100%)',
-    'linear-gradient(135deg, #cd7f32 0%, #8b4513 100%)',
-  ];
+  const sizes = { avatar: isFirst ? 72 : 56, title: isFirst ? 20 : 15, rank: isFirst ? 32 : 22 };
+  const medals = ['🥇', '🥈', '🥉'];
+  const winRate = player.matchesPlayed > 0 ? ((player.wins / player.matchesPlayed) * 100).toFixed(1) : '0';
 
   return (
-    <Card
-      style={{ textAlign: 'center', height: heights[rank - 1], borderRadius: 12, overflow: 'hidden' }}
-      styles={{ body: { padding: '16px 12px', background: bgColors[rank - 1] } }}
-    >
-      <div style={{ fontSize: isFirst ? 28 : 20 }}>{badges[rank - 1]} TOP {rank}</div>
-      <Avatar src={player.avatar} icon={<UserOutlined />} size={isFirst ? 64 : 48} style={{ margin: '8px 0', border: '2px solid #fff' }} />
-      <div style={{ color: '#fff', fontWeight: 'bold', fontSize: isFirst ? 18 : 14 }}>
+    <div className={`top-card top-card-${rank}`} style={{ padding: '20px 16px', borderRadius: 16, textAlign: 'center' }}>
+      <div className="top-rank" style={{ fontSize: sizes.rank, marginBottom: 4 }}>
+        {medals[rank - 1]} TOP {rank}
+      </div>
+      <Avatar
+        src={player.avatar}
+        icon={<UserOutlined />}
+        size={sizes.avatar}
+        className="top-avatar"
+        style={{ margin: '8px 0', border: '3px solid rgba(255,255,255,0.8)', boxShadow: '0 4px 12px rgba(0,0,0,0.2)' }}
+      />
+      <div className="top-name" style={{ fontSize: sizes.title, marginBottom: 6 }}>
         {player.nickname || '未命名'}
       </div>
-      <div style={{ color: 'rgba(255,255,255,0.9)', fontSize: 12, marginTop: 4 }}>
-        <Tag color={ratingColors[player.rating]} style={{ borderRadius: 4 }}>{player.rating}级</Tag>
-        {player.score}分 | {player.matchesPlayed}场 | 胜率 {player.matchesPlayed > 0 ? ((player.wins / player.matchesPlayed) * 100).toFixed(1) : 0}%
+      <div style={{ marginBottom: 6 }}><RatingTag rating={player.rating} /></div>
+      <div className="top-stats" style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
+        <span><ThunderboltOutlined /> {player.score}分</span>
+        <span>{player.matchesPlayed}场</span>
+        <span>胜率 {winRate}%</span>
       </div>
-    </Card>
+    </div>
   );
 }
 
@@ -83,24 +84,38 @@ export default function Home() {
 
   const leaderColumns: ColumnsType<Player> = [
     {
-      title: '#', width: 50,
-      render: (_, __, i) => <span style={{ fontWeight: 'bold' }}>{i + 4}</span>,
+      title: '#', width: 60, align: 'center',
+      render: (_, __, i) => {
+        const n = i + 4;
+        return <span className="player-rank-num player-rank-default">{n}</span>;
+      },
     },
     {
       title: '选手', dataIndex: 'nickname',
       render: (text: string, record: Player) => (
-        <span><Avatar src={record.avatar} icon={<UserOutlined />} size="small" style={{ marginRight: 8 }} />{text || '未命名'}</span>
+        <span style={{ display: 'inline-flex', alignItems: 'center', gap: 8 }}>
+          <Avatar src={record.avatar} icon={<UserOutlined />} size={32} />
+          <span style={{ fontWeight: 500 }}>{text || '未命名'}</span>
+        </span>
       ),
     },
     {
-      title: '评级', dataIndex: 'rating', width: 80,
-      render: (r: string) => <Tag color={ratingColors[r]}>{r}级</Tag>,
+      title: '评级', dataIndex: 'rating', width: 90, align: 'center',
+      render: (r: string) => <RatingTag rating={r} />,
     },
-    { title: '积分', dataIndex: 'score', width: 70, render: (s: number) => <span style={{ fontWeight: 'bold' }}>{s}</span> },
-    { title: '场次', dataIndex: 'matchesPlayed', width: 70 },
     {
-      title: '胜率', width: 80,
-      render: (_, r: Player) => r.matchesPlayed > 0 ? `${((r.wins / r.matchesPlayed) * 100).toFixed(1)}%` : '-',
+      title: '积分', dataIndex: 'score', width: 80, align: 'center',
+      render: (s: number) => <span className="score-highlight">{s}</span>,
+    },
+    { title: '场次', dataIndex: 'matchesPlayed', width: 70, align: 'center' },
+    {
+      title: '胜率', width: 80, align: 'center',
+      render: (_, r: Player) => {
+        if (r.matchesPlayed <= 0) return <span style={{ color: '#bbb' }}>-</span>;
+        const rate = (r.wins / r.matchesPlayed) * 100;
+        const color = rate >= 60 ? '#52c41a' : rate >= 40 ? '#faad14' : '#ff4d4f';
+        return <span style={{ fontWeight: 600, color }}>{rate.toFixed(1)}%</span>;
+      },
     },
   ];
 
@@ -110,23 +125,42 @@ export default function Home() {
       label: <span><FireOutlined /> 积分排行榜</span>,
       children: (
         <div>
+          <div className="page-header" style={{ marginBottom: 24 }}>
+            <h2><CrownOutlined style={{ marginRight: 8 }} />积分排行榜</h2>
+            <p>竞技场上的最强王者，用实力书写传奇</p>
+          </div>
+
           {top3.length > 0 && (
-            <Row gutter={16} style={{ marginBottom: 24 }}>
+            <Row gutter={[20, 20]} style={{ marginBottom: 32 }}>
               {top3.length >= 2 && (
-                <Col xs={24} sm={8}><div style={{ marginTop: 30 }}><TopPlayerCard player={top3[1]} rank={2} /></div></Col>
+                <Col xs={24} sm={8}>
+                  <div style={{ marginTop: 32 }}><TopPlayerCard player={top3[1]} rank={2} /></div>
+                </Col>
               )}
               {top3.length >= 1 && (
                 <Col xs={24} sm={8}><TopPlayerCard player={top3[0]} rank={1} /></Col>
               )}
               {top3.length >= 3 && (
-                <Col xs={24} sm={8}><div style={{ marginTop: 30 }}><TopPlayerCard player={top3[2]} rank={3} /></div></Col>
+                <Col xs={24} sm={8}>
+                  <div style={{ marginTop: 32 }}><TopPlayerCard player={top3[2]} rank={3} /></div>
+                </Col>
               )}
             </Row>
           )}
+
           {rest.length > 0 && (
-            <Table columns={leaderColumns} dataSource={rest} rowKey="id" pagination={false} size="small" />
+            <Card style={{ borderRadius: 12, overflow: 'hidden' }} styles={{ body: { padding: 0 } }}>
+              <Table
+                className="leaderboard-table"
+                columns={leaderColumns}
+                dataSource={rest}
+                rowKey="id"
+                pagination={false}
+                size="middle"
+              />
+            </Card>
           )}
-          {leaderboard.length === 0 && <Empty description="暂无积分数据" />}
+          {leaderboard.length === 0 && <Empty description="暂无积分数据" style={{ padding: 60 }} />}
         </div>
       ),
     },
@@ -135,7 +169,11 @@ export default function Home() {
       label: <span><TrophyOutlined /> 赛事大厅</span>,
       children: (
         <div>
-          <div style={{ marginBottom: 16 }}>
+          <div className="page-header" style={{ marginBottom: 24, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <h2><TrophyOutlined style={{ marginRight: 8 }} />赛事大厅</h2>
+              <p>发现精彩赛事，组队参加竞技</p>
+            </div>
             <Select
               placeholder="按状态筛选"
               allowClear
@@ -150,20 +188,21 @@ export default function Home() {
           </div>
           <Spin spinning={loading}>
             {competitions.length === 0 && !loading ? (
-              <Empty description="暂无赛事" />
+              <Empty description="暂无赛事" style={{ padding: 60 }} />
             ) : (
-              <Row gutter={[16, 16]}>
+              <Row gutter={[20, 20]}>
                 {competitions.map((comp) => (
                   <Col xs={24} sm={12} md={8} lg={6} key={comp.id}>
                     <Card
+                      className="competition-card"
                       hoverable
                       onClick={() => navigate(`/competition/${comp.id}`)}
                       cover={
                         comp.coverImage ? (
                           <img alt={comp.title} src={comp.coverImage} style={{ height: 160, objectFit: 'cover' }} />
                         ) : (
-                          <div style={{ height: 160, background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                            <TrophyOutlined style={{ fontSize: 48, color: '#fff' }} />
+                          <div className="competition-cover" style={{ background: 'linear-gradient(135deg, #1a1a2e 0%, #0f3460 60%, #e94560 100%)' }}>
+                            <TrophyOutlined style={{ fontSize: 52, color: 'rgba(255,255,255,0.8)', zIndex: 1 }} />
                           </div>
                         )
                       }
@@ -171,15 +210,15 @@ export default function Home() {
                       <Card.Meta
                         title={
                           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                            <span>{comp.title}</span>
+                            <span style={{ fontSize: 15, fontWeight: 600 }}>{comp.title}</span>
                             <Tag color={statusMap[comp.status]?.color}>{statusMap[comp.status]?.text}</Tag>
                           </div>
                         }
                         description={
-                          <div>
-                            <div><TrophyOutlined /> {comp.gameType}</div>
-                            <div><TeamOutlined /> {comp.teamSize}人队伍 · 最多{comp.maxTeams}支</div>
-                            <div><CalendarOutlined /> {dayjs(comp.registrationEnd).format('MM-DD HH:mm')} 截止报名</div>
+                          <div style={{ fontSize: 13, lineHeight: 2 }}>
+                            <div><TrophyOutlined style={{ marginRight: 6 }} />{comp.gameType}</div>
+                            <div><TeamOutlined style={{ marginRight: 6 }} />{comp.teamSize}人队伍 · 最多{comp.maxTeams}支</div>
+                            <div><CalendarOutlined style={{ marginRight: 6 }} />{dayjs(comp.registrationEnd).format('MM-DD HH:mm')} 截止</div>
                           </div>
                         }
                       />
@@ -194,5 +233,5 @@ export default function Home() {
     },
   ];
 
-  return <Tabs defaultActiveKey="leaderboard" items={tabItems} size="large" />;
+  return <Tabs className="home-tabs" defaultActiveKey="leaderboard" items={tabItems} size="large" />;
 }
