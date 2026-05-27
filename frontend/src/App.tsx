@@ -12,6 +12,8 @@ import AdminCompetitionEdit from './pages/admin/AdminCompetitionEdit';
 import AdminTeamReview from './pages/admin/AdminTeamReview';
 import AdminMatchManage from './pages/admin/AdminMatchManage';
 import Players from './pages/player/Players';
+import Rules from './pages/rules/Rules';
+import Champions from './pages/champions/Champions';
 
 function App() {
   return (
@@ -22,6 +24,8 @@ function App() {
           <Route path="/" element={<AppLayout />}>
             <Route index element={<Home />} />
             <Route path="players" element={<Players />} />
+            <Route path="rules" element={<Rules />} />
+            <Route path="champions" element={<Champions />} />
             <Route path="competition/:id" element={<CompetitionDetail />} />
             <Route path="my-teams" element={<MyTeams />} />
             <Route path="team/:id" element={<TeamDetail />} />

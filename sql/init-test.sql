@@ -16,11 +16,16 @@ CREATE TABLE IF NOT EXISTS `user` (
     `avatar` VARCHAR(255) DEFAULT NULL COMMENT '头像URL',
     `role` VARCHAR(20) NOT NULL DEFAULT 'PLAYER' COMMENT '角色: ADMIN/PLAYER',
     `status` TINYINT NOT NULL DEFAULT 1 COMMENT '状态: 0-禁用 1-正常',
+    `score` INT NOT NULL DEFAULT 0 COMMENT '个人积分',
+    `matches_played` INT NOT NULL DEFAULT 0 COMMENT '总场次',
+    `wins` INT NOT NULL DEFAULT 0 COMMENT '总胜场',
+    `rating` VARCHAR(10) NOT NULL DEFAULT 'C' COMMENT '评级: SSR/SR/S/A/B/C/D/E',
     `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     `updated_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (`id`),
     UNIQUE KEY `uk_phone` (`phone`),
-    KEY `idx_role` (`role`)
+    KEY `idx_role` (`role`),
+    KEY `idx_score` (`score` DESC)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='用户表';
 
 CREATE TABLE IF NOT EXISTS `competition` (
@@ -120,6 +125,19 @@ CREATE TABLE IF NOT EXISTS `sms_log` (
     PRIMARY KEY (`id`),
     KEY `idx_phone_sent` (`phone`, `sent_at`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='短信记录表';
+
+CREATE TABLE IF NOT EXISTS `champion_history` (
+    `id` BIGINT NOT NULL AUTO_INCREMENT,
+    `competition_id` BIGINT NOT NULL COMMENT '赛事ID',
+    `season_name` VARCHAR(50) NOT NULL COMMENT '赛季名称',
+    `team_name` VARCHAR(50) NOT NULL COMMENT '冠军队伍名称',
+    `captain_name` VARCHAR(50) DEFAULT NULL COMMENT '队长昵称',
+    `members` TEXT COMMENT '队员名单(逗号分隔)',
+    `crowned_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '夺冠时间',
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (`id`),
+    KEY `idx_competition` (`competition_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='冠军历史表';
 
 -- 测试环境管理员
 INSERT INTO `user` (`phone`, `nickname`, `role`) VALUES ('13800000000', UNHEX('E7AEA1E79086E59198'), 'ADMIN');

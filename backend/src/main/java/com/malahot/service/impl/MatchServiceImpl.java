@@ -8,6 +8,7 @@ import com.malahot.enums.MatchStatus;
 import com.malahot.enums.TeamStatus;
 import com.malahot.mapper.*;
 import com.malahot.service.MatchService;
+import com.malahot.service.PlayerScoreService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,6 +27,7 @@ public class MatchServiceImpl implements MatchService {
     private final CompetitionMapper competitionMapper;
     private final TeamMapper teamMapper;
     private final RankingMapper rankingMapper;
+    private final PlayerScoreService playerScoreService;
 
     @Override
     @Transactional
@@ -213,6 +215,9 @@ public class MatchServiceImpl implements MatchService {
         updateRanking(match.getCompetitionId(), winnerId, true);
         updateRanking(match.getCompetitionId(), loserId, false);
 
+        // Update individual player scores
+        playerScoreService.onMatchResult(winnerId, loserId);
+
         // Mark loser team as eliminated
         Team loserTeam = teamMapper.selectById(loserId);
         if (loserTeam != null) {
@@ -265,6 +270,9 @@ public class MatchServiceImpl implements MatchService {
             if (championTeam != null) {
                 championTeam.setStatus(TeamStatus.CHAMPION.name());
                 teamMapper.updateById(championTeam);
+
+                // Record champion history and award bonus points
+                playerScoreService.onChampion(competition, championTeam);
             }
 
             // Update final rankings

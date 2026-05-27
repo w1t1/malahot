@@ -4,7 +4,21 @@ export interface Player {
   id: number;
   nickname: string;
   avatar: string | null;
+  score: number;
+  matchesPlayed: number;
+  wins: number;
+  rating: string;
   createdAt: string;
+}
+
+export interface ChampionRecord {
+  id: number;
+  competitionId: number;
+  seasonName: string;
+  teamName: string;
+  captainName: string | null;
+  members: string | null;
+  crownedAt: string;
 }
 
 export interface PageResult<T> {
@@ -19,4 +33,10 @@ export const playerApi = {
     api.get<any, { data: PageResult<Player> }>('/players', {
       params: { page, size, keyword },
     }),
+  leaderboard: (limit = 50) =>
+    api.get<any, { data: Player[] }>('/players/leaderboard', {
+      params: { limit },
+    }),
+  champions: () =>
+    api.get<any, { data: ChampionRecord[] }>('/players/champions'),
 };

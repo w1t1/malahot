@@ -21,6 +21,14 @@ public class User {
 
     private Integer status;
 
+    private Integer score;
+
+    private Integer matchesPlayed;
+
+    private Integer wins;
+
+    private String rating;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

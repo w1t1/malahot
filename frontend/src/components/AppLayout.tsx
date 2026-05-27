@@ -7,6 +7,8 @@ import {
   UserOutlined,
   LogoutOutlined,
   SettingOutlined,
+  FileTextOutlined,
+  CrownOutlined,
 } from '@ant-design/icons';
 import { useAuthStore } from '../stores/auth';
 import type { MenuProps } from 'antd';
@@ -19,8 +21,10 @@ export default function AppLayout() {
   const isAdmin = role === 'ADMIN';
 
   const menuItems = [
-    { key: '/', icon: <HomeOutlined />, label: <Link to="/">赛事大厅</Link> },
+    { key: '/', icon: <HomeOutlined />, label: <Link to="/">首页</Link> },
     { key: '/players', icon: <TeamOutlined />, label: <Link to="/players">选手名单</Link> },
+    { key: '/champions', icon: <CrownOutlined />, label: <Link to="/champions">历届冠军</Link> },
+    { key: '/rules', icon: <FileTextOutlined />, label: <Link to="/rules">积分规则</Link> },
     ...(isLoggedIn
       ? [{ key: '/my-teams', icon: <TeamOutlined />, label: <Link to="/my-teams">我的战队</Link> }]
       : []),

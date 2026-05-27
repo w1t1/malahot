@@ -1,10 +1,16 @@
 import { useEffect, useState } from 'react';
-import { Table, Input, Avatar, Card } from 'antd';
+import { Table, Input, Avatar, Card, Tag } from 'antd';
 import { UserOutlined, SearchOutlined } from '@ant-design/icons';
 import { playerApi } from '../../api/player';
 import type { Player } from '../../api/player';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
+
+const ratingColors: Record<string, string> = {
+  SSR: '#ff4d4f', SR: '#fa8c16', S: '#faad14',
+  A: '#52c41a', B: '#1677ff', C: '#999',
+  D: '#bbb', E: '#ddd',
+};
 
 export default function Players() {
   const [players, setPlayers] = useState<Player[]>([]);
@@ -49,9 +55,31 @@ export default function Players() {
       render: (text: string) => text || '未设置昵称',
     },
     {
+      title: '评级',
+      dataIndex: 'rating',
+      width: 80,
+      render: (r: string) => <Tag color={ratingColors[r]}>{r}级</Tag>,
+    },
+    {
+      title: '积分',
+      dataIndex: 'score',
+      width: 80,
+      sorter: (a, b) => a.score - b.score,
+    },
+    {
+      title: '场次',
+      dataIndex: 'matchesPlayed',
+      width: 80,
+    },
+    {
+      title: '胜率',
+      width: 80,
+      render: (_, r: Player) => r.matchesPlayed > 0 ? `${((r.wins / r.matchesPlayed) * 100).toFixed(1)}%` : '-',
+    },
+    {
       title: '注册时间',
       dataIndex: 'createdAt',
-      width: 200,
+      width: 160,
       render: (text: string) => dayjs(text).format('YYYY-MM-DD HH:mm'),
     },
   ];
