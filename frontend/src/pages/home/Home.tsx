@@ -5,7 +5,7 @@ import { competitionApi } from '../../api/competition';
 import { playerApi } from '../../api/player';
 import type { Competition } from '../../api/competition';
 import type { Player } from '../../api/player';
-import { TrophyOutlined, TeamOutlined, CalendarOutlined, UserOutlined, FireOutlined, CrownOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { TrophyOutlined, TeamOutlined, CalendarOutlined, UserOutlined, FireOutlined, CrownOutlined } from '@ant-design/icons';
 import type { ColumnsType } from 'antd/es/table';
 import dayjs from 'dayjs';
 
@@ -44,7 +44,7 @@ function TopPlayerCard({ player, rank }: { player: Player; rank: number }) {
       </div>
       <div style={{ marginBottom: 6 }}><RatingTag rating={player.rating} /></div>
       <div className="top-stats" style={{ display: 'flex', justifyContent: 'center', gap: 12 }}>
-        <span><ThunderboltOutlined /> {player.score}分</span>
+        <span><CrownOutlined /> {player.championCount || 0}冠</span>
         <span>{player.matchesPlayed}场</span>
         <span>胜率 {winRate}%</span>
       </div>
@@ -104,8 +104,8 @@ export default function Home() {
       render: (r: string) => <RatingTag rating={r} />,
     },
     {
-      title: '积分', dataIndex: 'score', width: 80, align: 'center',
-      render: (s: number) => <span className="score-highlight">{s}</span>,
+      title: '冠军', dataIndex: 'championCount', width: 80, align: 'center',
+      render: (c: number) => <span className="score-highlight">{c || 0}</span>,
     },
     { title: '场次', dataIndex: 'matchesPlayed', width: 70, align: 'center' },
     {
@@ -122,11 +122,11 @@ export default function Home() {
   const tabItems = [
     {
       key: 'leaderboard',
-      label: <span><FireOutlined /> 积分排行榜</span>,
+      label: <span><FireOutlined /> 战力排行榜</span>,
       children: (
         <div>
           <div className="page-header" style={{ marginBottom: 24 }}>
-            <h2><CrownOutlined style={{ marginRight: 8 }} />积分排行榜</h2>
+            <h2><CrownOutlined style={{ marginRight: 8 }} />战力排行榜</h2>
             <p>竞技场上的最强王者，用实力书写传奇</p>
           </div>
 
@@ -160,7 +160,7 @@ export default function Home() {
               />
             </Card>
           )}
-          {leaderboard.length === 0 && <Empty description="暂无积分数据" style={{ padding: 60 }} />}
+          {leaderboard.length === 0 && <Empty description="暂无排行数据" style={{ padding: 60 }} />}
         </div>
       ),
     },

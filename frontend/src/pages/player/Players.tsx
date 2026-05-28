@@ -61,12 +61,12 @@ export default function Players() {
       render: (r: string) => <RatingTag rating={r} />,
     },
     {
-      title: '积分',
-      dataIndex: 'score',
+      title: '冠军',
+      dataIndex: 'championCount',
       width: 80,
       align: 'center',
-      sorter: (a, b) => a.score - b.score,
-      render: (s: number) => <span className="score-highlight">{s}</span>,
+      sorter: (a, b) => (a.championCount || 0) - (b.championCount || 0),
+      render: (c: number) => <span className="score-highlight">{c || 0}</span>,
     },
     {
       title: '场次',
@@ -97,7 +97,7 @@ export default function Players() {
     <div>
       <div className="page-header" style={{ marginBottom: 24 }}>
         <h2><TeamOutlined style={{ marginRight: 8 }} />选手名单</h2>
-        <p>所有注册选手的积分与战绩一览</p>
+        <p>所有注册选手的战力与战绩一览</p>
       </div>
       <Card style={{ borderRadius: 12 }}>
         <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'flex-end' }}>

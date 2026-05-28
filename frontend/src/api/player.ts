@@ -8,6 +8,7 @@ export interface Player {
   matchesPlayed: number;
   wins: number;
   rating: string;
+  championCount: number;
   createdAt: string;
 }
 

@@ -66,6 +66,7 @@ public class PlayerScoreServiceImpl implements PlayerScoreService {
             User user = userMapper.selectById(tm.getUserId());
             if (user != null) {
                 user.setScore(user.getScore() + bonus);
+                user.setChampionCount(user.getChampionCount() != null ? user.getChampionCount() + 1 : 1);
                 user.setRating(calculateRating(user.getScore()));
                 userMapper.updateById(user);
                 if (user.getNickname() != null) {
@@ -93,14 +94,14 @@ public class PlayerScoreServiceImpl implements PlayerScoreService {
 
     @Override
     public String calculateRating(int score) {
-        if (score >= 80) return "SSR";
-        if (score >= 60) return "SR";
-        if (score >= 45) return "S";
-        if (score >= 30) return "A";
-        if (score >= 20) return "B";
-        if (score >= 10) return "C";
-        if (score >= 5) return "D";
-        return "E";
+        if (score >= 80) return "SS";
+        if (score >= 60) return "S";
+        if (score >= 45) return "A";
+        if (score >= 30) return "B";
+        if (score >= 20) return "C";
+        if (score >= 10) return "D";
+        if (score >= 5) return "E";
+        return "F";
     }
 
     private List<TeamMember> getTeamMembers(Long teamId) {

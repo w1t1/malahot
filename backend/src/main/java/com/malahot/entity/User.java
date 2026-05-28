@@ -29,6 +29,8 @@ public class User {
 
     private String rating;
 
+    private Integer championCount;
+
     @TableField(fill = FieldFill.INSERT)
     private LocalDateTime createdAt;
 

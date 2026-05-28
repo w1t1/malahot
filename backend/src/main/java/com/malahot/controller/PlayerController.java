@@ -34,7 +34,8 @@ public class PlayerController {
                 .eq(User::getRole, "PLAYER")
                 .eq(User::getStatus, 1)
                 .select(User::getId, User::getNickname, User::getAvatar, User::getScore,
-                        User::getMatchesPlayed, User::getWins, User::getRating, User::getCreatedAt);
+                        User::getMatchesPlayed, User::getWins, User::getRating,
+                        User::getChampionCount, User::getCreatedAt);
         if (keyword != null && !keyword.isBlank()) {
             wrapper.like(User::getNickname, keyword);
         }
@@ -50,7 +51,8 @@ public class PlayerController {
                 .eq(User::getStatus, 1)
                 .gt(User::getScore, 0)
                 .select(User::getId, User::getNickname, User::getAvatar, User::getScore,
-                        User::getMatchesPlayed, User::getWins, User::getRating)
+                        User::getMatchesPlayed, User::getWins, User::getRating,
+                        User::getChampionCount)
                 .orderByDesc(User::getScore)
                 .last("LIMIT " + Math.min(limit, 100));
         return Result.success(userMapper.selectList(wrapper));
